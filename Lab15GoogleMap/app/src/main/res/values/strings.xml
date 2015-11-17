@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Lab 15 Google Map</string>
+    <string name="title_activity_maps">My Location Map</string>
+    <string name="title_activity_history">HistoryActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="history_on">Turn on Track</string>
+    <string name="history_off">Turn Off Track</string>
+</resources>

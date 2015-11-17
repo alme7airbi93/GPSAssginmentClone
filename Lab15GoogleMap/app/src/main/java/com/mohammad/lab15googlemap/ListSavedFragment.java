@@ -1,0 +1,157 @@
+package com.mohammad.lab15googlemap;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.List;
+
+/**
+ * Created by user on 11/12/2015.
+ */
+public class ListSavedFragment extends Fragment{
+    private SavedAdapter SavedAdapter;
+
+    MapsActivity mapsActivity;
+    RecyclerView recyclerView;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+         super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.fragment_location_history_list, container, false);
+
+
+
+        recyclerView = (RecyclerView)v.findViewById(R.id.his_recycler_view);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        updateUI();
+        return v;
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
+    private void updateUI()
+    {
+        Manager manager = Manager.getManager(getActivity());
+        List<OurLocation> ourLocations = manager.getLocations();
+        if(SavedAdapter == null) {
+            SavedAdapter = new SavedAdapter(ourLocations);
+            recyclerView.setAdapter(SavedAdapter);
+        }
+        else {
+            SavedAdapter.setSaved(ourLocations);
+            SavedAdapter.notifyDataSetChanged();
+        }
+    }
+    private class SavedHolder extends RecyclerView.ViewHolder implements View.OnClickListener
+    {
+
+        // Variables
+        private TextView tvSaved,tvHR;
+
+
+
+        private OurLocation ourLocation;
+
+        // Constracter
+        public SavedHolder(View view)
+        {
+            super(view);
+            view.setOnClickListener(this);
+            Log.d("tag", "holder contstructor");
+            tvSaved = (TextView)view.findViewById(R.id.tvListHistory);
+            tvHR = (TextView)view.findViewById(R.id.tvHR);
+
+            Log.d("tag", "holder afterfindviewbtn");
+
+        }
+
+        //
+        public void bindSaved(OurLocation ourLocation)
+        {
+            this.ourLocation = ourLocation;
+            tvSaved.setText(ourLocation.getAddress() + "\n" +
+                    "lat: " + ourLocation.getLat() + "\t lng: " + ourLocation.getLng());
+
+
+            Log.d("tag", "holder set");
+
+            Log.d("tag", "holder set 2");
+
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            Intent i = new Intent(getActivity(),MapsActivity.class);
+
+            startActivity(i);
+        }
+    }
+    private class SavedAdapter extends RecyclerView.Adapter<SavedHolder>
+    {
+        private List<OurLocation> ourLocations;
+
+        public SavedAdapter (List<OurLocation> ourLocations)
+        {
+            Log.d("tag","adapter constructor");
+            this.ourLocations = ourLocations;
+            Log.d("tag", "after");
+        }
+        @Override
+        public int getItemCount() {
+            Log.d("tag","adapter itemcount");
+            return ourLocations.size();
+        }
+
+        @Override
+        public SavedHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+
+            Log.d("tag","adapter oncreateviewholder");
+//            View v = inflater.inflate(android.R.layout.simple_list_item_1, viewGroup,false);
+            View v = inflater.inflate(R.layout.list_item_history, viewGroup, false);
+
+
+
+            Log.d("tag","adapter oncreateviewholderreturn");
+
+            return new SavedHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(SavedHolder SavedHolder, int i)
+        {
+            Log.d("tag","adapter onbindviewholder");
+            OurLocation ourLocation = ourLocations.get(i);
+            SavedHolder.bindSaved(ourLocation);
+        }
+        public void setSaved(List<OurLocation> ourLocations)
+        {
+            Log.d("tag","adapter setholder");
+            this.ourLocations = ourLocations;
+        }
+    }
+}

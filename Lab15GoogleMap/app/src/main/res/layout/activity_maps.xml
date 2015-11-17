@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#d4192427">
+
+
+
+
+    <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/btnHistory"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+    android:text="your History"
+        android:layout_marginBottom="0.5dp"
+    android:background="#6400ad17"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSaved"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="saved locations"
+        android:layout_marginTop="0.5dp"
+        android:background="#6400ad17"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_below="@id/btnSaved"
+        android:layout_height="wrap_content"
+        android:id="@+id/twobuttons"
+        android:orientation="horizontal"
+        android:background="#d4192427">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnTrack"
+            android:layout_weight="1"
+            android:text="Turn Off"
+
+            android:layout_marginRight="0.5dp"
+
+            android:background="#6400ad17"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnAdd"
+
+            android:layout_marginLeft="0.5dp"
+            android:layout_weight="1"
+            android:text="ADD Location"
+
+
+            android:background="#6400ad17"/>
+    </LinearLayout>
+
+
+
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:id="@+id/map"
+        tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" >
+
+
+
+
+
+
+    </fragment>
+
+</LinearLayout>
