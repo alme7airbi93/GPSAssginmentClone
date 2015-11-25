@@ -22,6 +22,8 @@ public class ListSavedFragment extends Fragment{
 
     MapsActivity mapsActivity;
     RecyclerView recyclerView;
+    boolean track;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +36,7 @@ public class ListSavedFragment extends Fragment{
          super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_location_history_list, container, false);
 
+        track = getActivity().getIntent().getBooleanExtra("tracker",false);
 
 
         recyclerView = (RecyclerView)v.findViewById(R.id.his_recycler_view);
@@ -106,6 +109,13 @@ public class ListSavedFragment extends Fragment{
         @Override
         public void onClick(View v) {
             Intent i = new Intent(getActivity(),MapsActivity.class);
+
+            i.putExtra("latTag", ourLocation.getLat());
+            i.putExtra("lngTag", ourLocation.getLng());
+            i.putExtra("addTag", ourLocation.getAddress());
+            i.putExtra("yes", false);
+
+            i.putExtra("tracker", track);
 
             startActivity(i);
         }

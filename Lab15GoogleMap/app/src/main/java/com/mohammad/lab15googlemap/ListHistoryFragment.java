@@ -22,6 +22,7 @@ public class ListHistoryFragment extends Fragment{
 
     MapsActivity mapsActivity;
     RecyclerView recyclerView;
+    boolean track;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +36,7 @@ public class ListHistoryFragment extends Fragment{
         View v = inflater.inflate(R.layout.fragment_location_history_list, container, false);
 
 
+        track = getActivity().getIntent().getBooleanExtra("tracker",false);
 
         recyclerView = (RecyclerView)v.findViewById(R.id.his_recycler_view);
 
@@ -115,6 +117,7 @@ public class ListHistoryFragment extends Fragment{
             i.putExtra("addTag", ourLocation.getAddress());
             i.putExtra("yes", false);
 
+            i.putExtra("tracker", track);
 
 
 

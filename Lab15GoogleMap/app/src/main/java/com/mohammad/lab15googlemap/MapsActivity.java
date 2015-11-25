@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.PersistableBundle;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -27,13 +28,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mohammad.lab15googlemap.database.LocationCursorWraper;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements GoogleMap.OnMyLocationButtonClickListener {
 
     private static final String TAG = "WhereAmI";
     public Marker whereAmI;
@@ -42,7 +44,11 @@ public class MapsActivity extends AppCompatActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private Button btnHistory, btnAddLocation, btnSavedLocations, btnTrack;
     private HistoryActivity historyActivity;
-    private boolean track;
+    private boolean track = true;
+    private Location location;
+    private boolean fromOtherPage = true;
+    private boolean isClicked = true;
+
 
 
     @Override
@@ -52,12 +58,16 @@ public class MapsActivity extends AppCompatActivity {
 
 
 
+
+
+
         btnHistory = (Button) findViewById(R.id.btnHistory);
         btnSavedLocations = (Button) findViewById(R.id.btnSaved);
         btnAddLocation = (Button) findViewById(R.id.btnAdd);
         btnTrack = (Button) findViewById(R.id.btnTrack);
 
         setUpMapIfNeeded();
+        mMap.setOnMyLocationButtonClickListener(this);
         manager = Manager.getManager(this);
         String serviceName = Context.LOCATION_SERVICE;
         locationManager = (LocationManager) getSystemService(serviceName);
@@ -72,7 +82,7 @@ public class MapsActivity extends AppCompatActivity {
         criteria.setCostAllowed(true);
 
         String provider = locationManager.getBestProvider(criteria, false);
-        final Location location = locationManager.getLastKnownLocation(provider);
+        location = getLastKnownLocation();
 
         LatLng latLng = fromLocationToLatLng(location);
 
@@ -88,7 +98,13 @@ public class MapsActivity extends AppCompatActivity {
 
         String lt = this.getIntent().getStringExtra("latTag");
         String ln = this.getIntent().getStringExtra("lngTag");
-        boolean fromOtherPage = this.getIntent().getBooleanExtra("yes",true);
+        String add = this.getIntent().getStringExtra("addTag");
+
+        track = this.getIntent().getBooleanExtra("tracker",false);
+        fromOtherPage = this.getIntent().getBooleanExtra("yes",true);
+
+
+
 
         if(fromOtherPage == false)
         {
@@ -96,17 +112,29 @@ public class MapsActivity extends AppCompatActivity {
             whereAmI = mMap.addMarker
                     (new MarkerOptions().position(ltlg)
                             .icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).title(add));
             Log.d("taggggggg", "-------------------------------------greeen--------------------------");
+
+            if (track == true) {
+
+                btnTrack.setText("tracker on");
+
+
+
+
+
+            } else {
+
+
+
+
+                btnTrack.setText("tracker off");
+
+
+            }
         }
         else
         {
-            Log.d("tggagag","arriiiiiiiiiiiivesssssssss--------------------------------998978787678565765765");
-
-            whereAmI = mMap.addMarker
-                    (new MarkerOptions().position(latLng)
-                            .icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
 
             updateWithNewLocation(location);
         }
@@ -117,7 +145,7 @@ public class MapsActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent i = new Intent(MapsActivity.this, HistoryActivity.class);
-
+                i.putExtra("tracker", track);
                 startActivity(i);
 
 
@@ -129,6 +157,7 @@ public class MapsActivity extends AppCompatActivity {
 
                 Intent i = new Intent(MapsActivity.this, SavedActivity.class);
 
+                i.putExtra("tracker", track);
                 startActivity(i);
 
 
@@ -155,8 +184,8 @@ public class MapsActivity extends AppCompatActivity {
         if (track == true) {
 
                 track = false;
-                Toast.makeText(MapsActivity.this, "Tracker Off", Toast.LENGTH_SHORT).show();
-                btnTrack.setText(R.string.history_on);
+
+                btnTrack.setText("tracker off");
 
 
 
@@ -164,16 +193,37 @@ public class MapsActivity extends AppCompatActivity {
 
 
             track = true;
-            Toast.makeText(MapsActivity.this, "Tracker On", Toast.LENGTH_SHORT).show();
-            btnTrack.setText(R.string.history_off);
+
+            btnTrack.setText("tracker on");
 
 
         }
     }
 });
 
+
+
     }
 
+    private Location getLastKnownLocation() {
+        List<String> providers = locationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location location = locationManager.getLastKnownLocation(provider);
+
+            if (location == null) {
+
+                continue;
+            }
+            if (bestLocation == null || location.getAccuracy() < bestLocation.getAccuracy()) {
+                bestLocation = location;
+            }
+        }
+        if (bestLocation == null) {
+            return null;
+        }
+        return bestLocation;
+    }
     private LatLng fromLocationToLatLng(Location location) {
 
         return new LatLng(location.getLatitude(), location.getLongitude());
@@ -222,12 +272,17 @@ public class MapsActivity extends AppCompatActivity {
 
 
 
-
                 whereAmI = mMap.addMarker
                         (new MarkerOptions().position(latLng)
                                 .icon(BitmapDescriptorFactory
                                         .defaultMarker(BitmapDescriptorFactory.HUE_CYAN)).title("You Are Here"));
                 Log.d("taggggggg", "-------------------------------------bluuuuuuuuuee--------------------------");
+
+
+
+
+
+
 
 
             latLongString = "Lat:" + location.getLatitude() + "\n" + "Long:" + location.getLongitude();
@@ -327,11 +382,25 @@ public class MapsActivity extends AppCompatActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setMyLocationEnabled(true);
     }
 
 
+    @Override
+    public boolean onMyLocationButtonClick() {
+
+
+        Log.d("myloc", "--------------------------------------------------------**********************************************");
+
+        if (whereAmI != null) {
+            whereAmI.remove();
+
+        }
+        fromOtherPage = true;
+
+        return false;
+    }
 
 
 
